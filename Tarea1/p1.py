@@ -15,6 +15,19 @@ import matplotlib.pyplot as plt
 import sys # Solo para mostrar version de python
 import time # Solo para ver tiempo de ejecucion
 
+### Debug
+def initial_debug_time():
+    global tiempo_inicio_d
+    tiempo_inicio_d = time.time()
+
+def final_debug_time():
+    tiempo_final_d = time.time()
+    tiempo_ejecucion_d = tiempo_final_d - tiempo_inicio_d
+    print("\n**************************************************************")
+    print(f"DEBUG: Tiempo de ejecucion: {tiempo_ejecucion_d:.3f} segundos")
+    print("**************************************************************\n")
+
+
 tiempo_inicio = time.time()
 
 print("===============================VERSIONES================================")
@@ -70,12 +83,16 @@ print("\n=== CONSTRUCCIÓN DE LA RED BAYESIANA (HILL CLIMBING) ===")
 # Encuentra una red bayesiana que se ajuste a los datos con una heuristica basada en un criterio de puntuacion (BIC),
 # lo que implica que no garantiza un optimo global, pero encuentra un optimo local en un buen tiempo de ejecucion
 
+initial_debug_time()
+
 hc = HillClimbSearch(df)
 
 modelo_hc = hc.estimate(scoring_method=BIC(df))
 
 print("Aristas encontradas:")
 print(modelo_hc.edges())
+
+final_debug_time()
 
 # Ver grafo
 G = nx.DiGraph(modelo_hc.edges())
@@ -130,11 +147,15 @@ df_short = df[[
     "population"
 ]]
 
+initial_debug_time()
+
 es = ExhaustiveSearch(df_short, scoring_method=BIC(df_short))
 modelo_ex = es.estimate()
 
 print("Aristas encontradas:")
 print(modelo_ex.edges())
+
+final_debug_time()
 
 # Ver grafo
 G = nx.DiGraph(modelo_ex.edges())
