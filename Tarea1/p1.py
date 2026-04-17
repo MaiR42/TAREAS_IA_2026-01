@@ -5,7 +5,7 @@ import pgmpy as pgmpy
 from pgmpy.estimators import HillClimbSearch, ExhaustiveSearch # Estos son los importantes
 from pgmpy.estimators import BIC, BDeu, K2         # De estos solo se pide BIC por el moment
 from pgmpy.models import DiscreteBayesianNetwork
-from pgmpy.estimators import MaximumLikelihoodEstimator # Tampoco se pide ***quisas borrar despues***
+from pgmpy.estimators import MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
 
 
@@ -180,7 +180,7 @@ i1 = inferencia.query(
 )
 print("\n========= INFERENCIA 1=========")
 print("Probabilidad de que un hongo sea venenoso \ndado a que tiene olor picante (spicy)\n")
-print("P(poisonous/odor=spicy)")
+print("P(poisonous/odor=s)")
 print("================================")
 print(i1)
 
@@ -190,11 +190,11 @@ i2 = inferencia.query(
 )
 print("\n========= INFERENCIA 2=========")
 print("Probabilidad del habitad de un hongo \ndado a que su poblacion es abundante\n")
-print("P(habitad/population=abundante)")
+print("P(habitad/population=a)")
 print("================================")
 print(i2)
 
 ##################################################################################################
 tiempo_final = time.time()
 tiempo_ejecucion = tiempo_final - tiempo_inicio
-print(f"\n\nTiempo de ejecucion: {tiempo_ejecucion:.4f} segundos\n")
+print(f"\n\nTiempo de ejecucion: {tiempo_ejecucion:.3f} segundos\n")
