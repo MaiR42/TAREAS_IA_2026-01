@@ -2,19 +2,20 @@ import pandas as pd
 import numpy as np
 import pgmpy as pgmpy
 
-from pgmpy.estimators import HillClimbSearch, ExhaustiveSearch # Estos son los importantes
-from pgmpy.estimators import BIC, BDeu, K2         # De estos solo se pide BIC por el moment
+from pgmpy.estimators import HillClimbSearch, ExhaustiveSearch
+from pgmpy.estimators import BIC
 from pgmpy.models import DiscreteBayesianNetwork
 from pgmpy.estimators import MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
 from pgmpy.sampling import BayesianModelSampling
 
+from ucimlrepo import fetch_ucirepo
 
 import networkx as nx # Para ver grafos
 import matplotlib.pyplot as plt
 
 import sys # Solo para mostrar version de python
-import time # Solo para ver tiempo de ejecucion
+import time # Solo para debug de tiempos de ejecucion
 
 ### Debug
 def initial_debug_time():
@@ -28,6 +29,13 @@ def final_debug_time():
     print(f"DEBUG: Tiempo de ejecucion: {tiempo_ejecucion_d:.3f} segundos")
     print("**************************************************************\n")
 
+def debug_text(): # Pa ver en que parte del codigo estoy,,, tmb lo voy a usar para cuando cambio de tema
+    global n_debug
+    print("\n****************************************************************************************************************************")
+    print("DEBUG: ", n_debug)
+    print("****************************************************************************************************************************\n")
+    n_debug += 1
+n_debug = 0
 
 tiempo_inicio = time.time()
 
@@ -40,7 +48,6 @@ print("========================================================================"
 
 
 # Cargar el dataset
-from ucimlrepo import fetch_ucirepo
 dataset = fetch_ucirepo(id=73) # Dataset: Mushroom
 X = dataset.data.features 
 y = dataset.data.targets 
@@ -83,7 +90,6 @@ print("\n=== CONSTRUCCIÓN DE LA RED BAYESIANA (HILL CLIMBING) ===")
 # Va buscando soluciones de manera iterativa, evaluando el movimiento de nodos en base a un criterio de puntuación (BIC),
 #  lo que implica que no garantiza un óptimo global, pero encuentra un óptimo local en un tiempo de ejecución razonable
 
-initial_debug_time()
 
 hc = HillClimbSearch(df)
 
@@ -92,7 +98,6 @@ modelo_hc = hc.estimate(scoring_method=BIC(df))
 print("Aristas encontradas:")
 print(modelo_hc.edges())
 
-final_debug_time()
 
 # Ver grafo
 G = nx.DiGraph(modelo_hc.edges())
@@ -148,7 +153,6 @@ df_short = df[[
     "population"
 ]]
 
-initial_debug_time()
 
 es = ExhaustiveSearch(df_short, scoring_method=BIC(df_short))
 modelo_ex = es.estimate()
@@ -156,7 +160,6 @@ modelo_ex = es.estimate()
 print("Aristas encontradas:")
 print(modelo_ex.edges())
 
-final_debug_time()
 
 # Ver grafo
 G = nx.DiGraph(modelo_ex.edges())
