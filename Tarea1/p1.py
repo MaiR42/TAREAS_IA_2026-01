@@ -8,14 +8,13 @@ from pgmpy.models import DiscreteBayesianNetwork
 from pgmpy.estimators import MaximumLikelihoodEstimator
 from pgmpy.inference import VariableElimination
 from pgmpy.sampling import BayesianModelSampling
-
 from ucimlrepo import fetch_ucirepo
 
 import networkx as nx # Para ver grafos
 import matplotlib.pyplot as plt
 
 import sys # Solo para mostrar version de python
-import time # Solo para debug de tiempos de ejecucion
+import time # Solo para ver tiempo de ejecucion
 
 ### Debug
 def initial_debug_time():
