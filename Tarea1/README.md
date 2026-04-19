@@ -1,7 +1,7 @@
 # Tarea 1 - Inteligencia Artificial 2026-01
 ## Objetivo de la tarea:
 
-Parte 1: Aprender estructura de red Bayesiana asociada al dataset "Mushroom", a través de los métodos de Hill-Climbing y Exhaustive Search. Además de aumenta el tamaño del dataset con datos sintéticos.  
+Parte 1: Aprender estructura de red Bayesiana asociada al dataset "Mushroom", a través de los métodos de Hill-Climbing y Exhaustive Search. Además de aumentar el tamaño del dataset con datos sintéticos.  
 
 Parte 2: Estudiar dataset "Human Activity Recognition Using Smartphones" para construir un HMM discretizado para luego realizar inferencias dado una secuencia de observaciones.
 
