@@ -1,23 +1,12 @@
 import pgmpy as pgmpy
 
-from pgmpy.estimators import HillClimbSearch, ExhaustiveSearch
-from pgmpy.estimators import BIC
-from pgmpy.models import DiscreteBayesianNetwork
-from pgmpy.estimators import MaximumLikelihoodEstimator
-from pgmpy.inference import VariableElimination
-from pgmpy.sampling import BayesianModelSampling
-
-import networkx as nx
-import matplotlib.pyplot as plt
-
 import sys # Solo para mostrar version de python
 import time # Solo para ver tiempo de ejecucion
 
 # Librerias que se colocaron ahora
 import pandas as pd
 import numpy as np
-from sklearn.preprocessing import LabelEncoder
-from hmmlearn import hmm
+from hmmlearn.hmm import CategoricalHMM
 
 ### Debug
 def initial_debug_time():
@@ -136,6 +125,7 @@ debug_text()
 # Forzar las 9 combinaciones de observaciones, pq si no tira solo 7 combinaciones
 levels = ["low", "medium", "high"]
 all_obs = [f"{i}_{j}" for i in levels for j in levels]
+
 df["observation"] = pd.Categorical(
     df["I_acc_disc"].astype(str) + "_" + df["I_gyro_disc"].astype(str),
     categories=all_obs
@@ -145,10 +135,11 @@ print(df["observation"].unique()) # Verificar
 # # # # B)
 
 # HMMs necesitan variables numéricas, así que se codifican las observaciones
-le = LabelEncoder()
-df["obs_encoded"] = le.fit_transform(df["observation"])
+n_obs = len(df["observation"].cat.categories)
+df["obs_encoded"] = df["observation"].cat.codes
 
-
+# Ordenar por sujeto para crear secuencias de observaciones por sujeto
+df = df.sort_values(by=["subject"]).reset_index(drop=True)
 # Crear secuencias de observaciones
 sequences_obs = []
 sequences_states = []
@@ -161,7 +152,6 @@ for subject in df["subject"].unique():
 print("Cantidad de secuencias:", len(sequences_obs))
 print("Largo de primera secuencia:", len(sequences_obs[0]))
 
-n_obs = len(le.classes_)
 # Estimar vector inicial pi, matriz de transicion T y matriz de emision E
 n_states = len(df["activity"].unique())
 pi = np.zeros(n_states)
@@ -192,8 +182,70 @@ for seq_s, seq_o in zip(sequences_states, sequences_obs):
 E = E / E.sum(axis=1, keepdims=True)
 
 # # # # Crear modelo HMM
-model = hmm.MultinomialHMM(n_components=6) # 6 estados ocultos (actividades)
+model = CategoricalHMM(n_components=6) # 6 estados ocultos (actividades)
+model.n_features = E.shape[1]
+model.n_trials = 1
+
 model.startprob_ = pi
 model.transmat_ = T
 model.emissionprob_ = E
 
+print("pi:", model.startprob_)
+print("T (m x n) = ", model.transmat_.shape)
+print("E (m x n) = ", model.emissionprob_.shape)
+
+debug_text()
+
+# # # # # C) Seleccionar secuencia de observaciones y realizar consultas
+
+# Backward y forward para una secuencia de 10 observaciones
+seq = sequences_obs[0][:10]  # primera secuencia, primeras 10 observaciones del primer sujeto
+seq = np.array(seq).reshape(-1, 1) # hmmlearn espera shape (n_samples, n_features), y acá n_features=1 porque es una secuencia de observaciones discretas
+
+logprob, posteriors = model.score_samples(seq)
+
+# Realizar 4 consultas en diferentes puntos de la secuencia
+# Probabilidad de cada estado oculto en t=0, t=1, t=5 y t=9
+# Recordar que los estados ocultos visualizan desde 0 a 5, y las observaciones desde 0 a 8
+print("t=0, probabilidad de cada estado oculto:")
+print(posteriors[0])
+print("t=1, probabilidad de cada estado oculto:")
+print(posteriors[1])
+print("t=5, probabilidad mas alta la tiene el estado: ",np.argmax(posteriors[5]))
+print("t=9, probabilidad mas alta la tiene el estado: ", np.argmax(posteriors[9]))
+
+# Para comprobar la ultima consulta
+print("t=9, probabilidad de cada estado oculto:")
+print(posteriors[9])
+
+debug_text()
+
+# # # # Viterbi
+seq = sequences_obs[0][:10]
+seq = np.array(seq).reshape(-1, 1)
+
+logprob, states = model.decode(seq, algorithm="viterbi") # Probabilidad logaritmica¿
+prob = np.exp(logprob)
+
+#  Solo para que se vea mas claro
+state_names = [
+    "Walking",
+    "Walking Upstairs",
+    "Walking Downstairs",
+    "Sitting",
+    "Standing",
+    "Laying"
+]
+for t, s in enumerate(states):
+    print(f"t={t}: {state_names[s]}")
+
+print("Probabilidad del camino mas probable de estados ocultos junto con las observaciones: ", prob*100,"%")    
+
+# # # # # D) Analisis
+
+
+
+
+tiempo_final = time.time()
+tiempo_ejecucion = tiempo_final - tiempo_inicio
+print(f"\n\nTiempo de ejecucion: {tiempo_ejecucion:.3f} segundos\n")
