@@ -92,7 +92,6 @@ for col in df.columns:
 
 
 # # # Indices para las observaciones
-debug_text()
 
 df["I_acc"] = (df["tBodyAccMag-mean()"] + df["tBodyAccMag-std()"]) / 2
 df["I_gyro"] = (df["tBodyGyroMag-mean()"] + df["tBodyGyroMag-std()"]) / 2
@@ -120,7 +119,7 @@ print(df["I_gyro_disc"].value_counts())
 # # # Crear Observaciones
 # Las 9 observaciones posibles vienen de combinar las 3 categorias entre los indices (acc y gyro)
 
-debug_text()
+
 
 # Forzar las 9 combinaciones de observaciones, pq si no tira solo 7 combinaciones
 levels = ["low", "medium", "high"]
@@ -194,7 +193,7 @@ print("pi:", model.startprob_)
 print("T (m x n) = ", model.transmat_.shape)
 print("E (m x n) = ", model.emissionprob_.shape)
 
-debug_text()
+
 
 # # # # # C) Seleccionar secuencia de observaciones y realizar consultas
 
@@ -218,7 +217,7 @@ print("t=9, probabilidad mas alta la tiene el estado: ", np.argmax(posteriors[9]
 print("t=9, probabilidad de cada estado oculto:")
 print(posteriors[9])
 
-debug_text()
+
 
 # # # # Viterbi
 seq = sequences_obs[0][:10]
