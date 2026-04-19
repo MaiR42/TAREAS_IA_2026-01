@@ -2,7 +2,10 @@
 ## Objetivo de la tarea:
 ñamñam
 ## Dataset
-https://archive.ics.uci.edu/dataset/73/mushroom
+Parte 1:  
+https://archive.ics.uci.edu/dataset/73/mushroom  
+Parte 2:  
+https://archive.ics.uci.edu/dataset/240/human+activity+recognition+using+smartphones  
 ## Programa ejecutado con:
 #### Python 3.11
 #### Librerias:
