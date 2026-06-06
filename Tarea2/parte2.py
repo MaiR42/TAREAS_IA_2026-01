@@ -10,9 +10,6 @@ y = secondary_mushroom.data.targets
 df = X.copy()
 df["class"] = y
 
-print(df.shape)
-print(df.head())
-
 #### Temporal, quitar filas
 
 df = df.sample(
