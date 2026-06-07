@@ -2,3 +2,5 @@ opencv-python
 matplotlib
 ucimlrepo
 pandas
+scikit-learn
+numpy
