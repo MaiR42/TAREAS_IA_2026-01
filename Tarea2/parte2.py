@@ -1,23 +1,18 @@
 import pandas as pd
-from ucimlrepo import fetch_ucirepo 
+import numpy as np
+from ucimlrepo import fetch_ucirepo
   
-# fetch dataset 
-secondary_mushroom = fetch_ucirepo(id=848) 
-  
-# data (as pandas dataframes) 
-X = secondary_mushroom.data.features 
-y = secondary_mushroom.data.targets 
 
+# Cargar dataset
+secondary_mushroom = fetch_ucirepo(id=848)
+X = secondary_mushroom.data.features
+y = secondary_mushroom.data.targets
 df = X.copy()
 df["class"] = y
 
-#### Temporal, quitar filas
 
-df = df.sample(
-    n=15000,
-    random_state=42
-).reset_index(drop=True)
-
+# Eliminar temporalmente
+df = df.sample(n=15000, random_state=42).reset_index(drop=True)
 print(df.shape)
 
 ####
@@ -35,12 +30,12 @@ df = df.drop(columns=[
     "spore-print-color"
 ])
 
-print("df despues de eliminar columnas")
+print("df despues de eliminar columnas") # Debug
 print(df.shape)
 print(df.head())
 
 
-# Elegir las Y
+# Elegir las variables objetivo
 Y1 = "cap-diameter" # Continua
 Y2 = "class" # Discreta
 
@@ -60,51 +55,48 @@ features = [
 
 # Crear dataset para regresion y clasificacion
 
-X = df[features]
-X = pd.get_dummies(X, drop_first=True)
 
-y_reg = df[Y1]  # Y1
-y_clf = df[Y2]  # Y2
+# Codificación de variables categóricas
+X_enc = pd.get_dummies(df[features], drop_first=True)
 
 from sklearn.preprocessing import LabelEncoder
-
 le = LabelEncoder()
+y_clf = le.fit_transform(df[Y2]) # Codificación de Y2
+y_reg = df[Y1].values.astype(np.float32)
 
-y_clf = le.fit_transform(y_clf)
-
-# Etapa de entrenamiento (Regresion)
+# Division entrenamiento, validacion y test
 
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
-X_train, X_temp, y_reg_train, y_reg_temp = train_test_split(
-    X,
+# Regre
+X_train_r, X_temp_r, y_train_r, y_temp_r = train_test_split(
+    X_enc,
     y_reg,
     test_size=0.30, # 70% para entrenamiento y 30% restante
     random_state=42
 )
-
-X_val, X_test, y_reg_val, y_reg_test = train_test_split(
-    X_temp,
-    y_reg_temp,
+X_val_r, X_test_r, y_val_r, y_test_r = train_test_split(
+    X_temp_r,
+    y_temp_r,
     test_size=0.50, # 50% del 30% restante anterior -> 15% para validacion y test
     random_state=42
 )
-
-# Etapa de entrenamiento (Clasificacion)
-
-X_train2, X_temp2, y_clf_train, y_clf_temp = train_test_split(
-    X,
+ 
+# Clasif
+X_train_c, X_temp_c, y_train_c, y_temp_c = train_test_split(
+    X_enc,
     y_clf,
-    test_size=0.30,
+    test_size=0.30, # 70% para entrenamiento y 30% restante
     random_state=42,
     stratify=y_clf
 )
-
-X_val2, X_test2, y_clf_val, y_clf_test = train_test_split(
-    X_temp2,
-    y_clf_temp,
-    test_size=0.50,
+X_val_c, X_test_c, y_val_c, y_test_c = train_test_split(
+    X_temp_c,
+    y_temp_c,
+    test_size=0.50, # 50% del 30% restante anterior -> 15% para validacion y test
     random_state=42,
-    stratify=y_clf_temp
+    stratify=y_temp_c
 )
+
 
