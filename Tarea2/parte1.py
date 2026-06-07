@@ -2,6 +2,8 @@ GUARDAR_IMG = False # Para no demorarme tanton,,, DEBUG
 
 # Inicio tarea 2
 import cv2
+import matplotlib.pyplot as plt
+
 
 img1 = cv2.imread("./data/img1.jpg")
 img2 = cv2.imread("./data/img2.jpg")
@@ -19,20 +21,26 @@ def resultado_imagen(p_img ,p_sp, p_sr, p_maxLevel):
 # Pruebas
 
 imagenes = [img1, img2, img3]
-valores_sp = [5, 15, 30] # Elegir 3
+valores_sp = [5, 30, 80] # Elegir 3
 valores_sr = [10, 30, 60] # Elegir 3
 valores_maxLevel = [0,1]
 
 # Mostrar imagenes originales
 def mostrar_imagenes(imagenes):
-    i = 0
-    for img in imagenes:
-        i+=1
-        cv2.imshow(f"Original {i}", img)
-        input()
+    for i, img in enumerate(imagenes, start=1):
 
-if GUARDAR_IMG:
-    mostrar_imagenes(imagenes)
+        img_rgb = cv2.cvtColor(
+            img,
+            cv2.COLOR_BGR2RGB
+        )
+
+        plt.figure(figsize=(8,6))
+        plt.imshow(img_rgb)
+        plt.title(f"Imagen {i}")
+        plt.axis("off")
+        plt.show()
+
+mostrar_imagenes(imagenes)
 
 # Guardar resultados
 import os
@@ -62,6 +70,7 @@ if GUARDAR_IMG:
 
                     print("Guardado:", nombre_archivo)
 
+print("VER HASTA AQUI")
 
 # Plot de imagenes para analisis
 import matplotlib.pyplot as plt
